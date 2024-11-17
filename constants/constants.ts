@@ -17,3 +17,21 @@ export const tableColumns = [
     label: 'Duration'
 }
 ]
+
+export interface DataHolder {
+    Date: Date | string,
+    dateTime :  Date | string,
+    Task: string,
+    Start: string,
+    End: string,
+    Duration: string
+}
+
+
+export interface IUserData {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    job?: string;
+    workplaceId?: string;
+}

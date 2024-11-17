@@ -12,7 +12,10 @@
   "dependencies": {
     "@nuxt/ui": "^2.19.2",
     "@nuxtjs/tailwindcss": "^6.12.2",
+    "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
     "nuxt": "^3.14.159",
+    "v-calendar": "^3.1.2",
     "vue": "latest",
     "vue-router": "latest"
   }

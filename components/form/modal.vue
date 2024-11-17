@@ -31,15 +31,14 @@ import type { FormSubmitEvent } from '#ui/types'
 
 
 const props = defineProps({
-    isOpen : {type : Boolean, required : true, default : false}
+    isOpen : {type : Boolean, required : true, default : false},
+    storedValue : {type: Object, required : false}
 })
 const emit = defineEmits(['updateState', 'updateDetails'])
 
 
-const modalOpen = ref<boolean>(false)
-watch(() => props.isOpen,(newData : any)=> modalOpen.value = newData, {immediate : true})
-watch(() => modalOpen.value,(newData : any)=> emit('updateState', newData), {immediate : true})
 
+const modalOpen = ref<boolean>(false)
 
 const schema = object({
   email: string().email('Invalid email').required('Required'),
@@ -56,14 +55,24 @@ const state = reactive({
   email: undefined,
   firstName : undefined,
   lastName : undefined,
-  job : '',
-  workplaceId : '',
+  job : undefined,
+  workplaceId : undefined,
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    emit('updateDetails', state);
+  emit('updateDetails', state);
 }
 
+
+watch(() => props.isOpen,(newData : any)=> modalOpen.value = newData, {immediate : true})
+watch(() => modalOpen.value,(newData : any)=> emit('updateState', newData), {immediate : true})
+watch(() => props.storedValue,(newData : any)=> {
+  state.email = newData.email
+  state.firstName = newData.firstName
+  state.lastName = newData.lastName
+  state.job = newData.job
+  state.workplaceId = newData.workplaceId
+}, {immediate : true})
 </script>
 
 <style scoped>
