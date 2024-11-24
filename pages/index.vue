@@ -1,23 +1,28 @@
+
 <template>
   <UContainer class="flex flex-col gap-2">
-    <div class="flex gap-2 ">
-      <DateMultiple @updateDate="updateDate"/>
-      <UButton label="Open" @click="isOpen = true" />
-      <UButton label="Search" @click="searchData"/>
+    <div class="flex items-end justify-between">
+      <UserDetails :state="userState" />
+      <div class="flex gap-2 justify-end">
+        <DateMultiple @updateDate="updateDate"/>
+        <UButton @click="isOpen = true" icon="i-heroicons-cog"/>
+        <UButton @click="searchData" icon="i-heroicons-magnifying-glass" :loading="isLoading"/>
+        <UButton @click="" icon="i-heroicons-printer" :loading="isLoading" :disabled="tableData.length == 0"/>
+      </div>
     </div>
-    <TableUi :tableData="tableData"/>
-    
+    <TableUi :tableData="tableData" :isLoading="isLoading"/>
   </UContainer>
   <FormModal :isOpen="isOpen" @updateState="(data:boolean)=> isOpen = data" @updateDetails="updateDetails" :storedValue="userState"/>
-
 </template>
 
 <script lang="ts" setup>
 import { sub, format, isSameDay, type Duration } from 'date-fns'
 import type { DataHolder, IUserData } from '~/constants/constants';
-import { GET } from '~/utils/axios';
+import { AGET } from '~/utils/axios';
 
 const isOpen = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
+
 const tableData = ref([])
 const userState = ref<IUserData>({
   email: undefined,
@@ -26,11 +31,10 @@ const userState = ref<IUserData>({
   job : undefined,
   workplaceId : undefined,
 })
-const isLoading = ref<boolean>(false)
+
 
 const updateDetails = (data:object) => {
   userState.value = data
-  console.log(userState.value)
   isOpen.value = false
 }; 
 
@@ -45,15 +49,23 @@ async function searchData() {
   isLoading.value = true
 
   try {
-    const {name, id} = (await GET(`https://api.clockify.me/api/v1/workspaces/${workspaceId}/users?email=${userState.value.email}`,{'X-Api-Key': apiKey}))[0];
-
     let startDate = `${isoDate(selectedDate.value.start)}T00:00:00Z`
     let endDate = `${isoDate(selectedDate.value.end)}T24:00:00Z`
-    
-    const listOfData = await GET(`https://api.clockify.me/api/v1/workspaces/${workspaceId}/user/${id}/time-entries?start=${startDate}&end=${endDate}`,{'X-Api-Key': apiKey})
+    let name =   userState.value!.firstName &&  userState.value!.lastName ? `${ userState.value!.firstName} ${ userState.value!.lastName}` : ''
 
-    tableData.value = listOfData.map((data:any) =>jsonFormatter(data)).sort((a:DataHolder, b:DataHolder) => parseDate(a.dateTime).getTime() - parseDate(b.dateTime).getTime())
+    const res : any = await AGET({
+      link : `http://localhost:8080/clockify/main/user`,
+      params : {
+        email : userState.value.email ?? '',
+        name : name,
+        job :  userState.value.job ?? '',
+        start: startDate,
+        end: endDate,
+        workspaceId : workspaceId
+      }
+    })
 
+    tableData.value = res?.rows
   } catch (error) {
     useToastNotification().error({title : "Error Parsing Data"})
   } finally {

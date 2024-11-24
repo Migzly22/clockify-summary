@@ -1,6 +1,11 @@
 <template>
     <div class="flex flex-col gap-5">
-        <UTable :rows="mainData" :columns="tableColumns"/>
+        <UTable 
+            :loading="isLoading"
+            :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Loading...' }"
+            :progress="{ color: 'primary', animation: 'carousel' }"
+            :rows="mainData" :columns="tableColumns"
+        />
         <div class="flex justify-end">
             <UPagination v-model="pageData.current" :page-count="pageData.count" :total="tableData.length" />
         </div>
@@ -16,7 +21,8 @@ const props = defineProps({
     tableData : {
         type : Array as PropType<Object[]>,
         required : true
-    }
+    },
+    isLoading : {type : Boolean}
 })
 
 const pageData = reactive({

@@ -7,3 +7,15 @@ export interface InputParams {
 }
 
 type NotificationColor = 'emerald' | 'rose' | 'amber' | 'blue';
+
+export interface BaseResponse<T> {
+    response ?: T,
+    row ?: Array<T>,
+    count ?: number,
+    error?: {
+        code?: number;
+        message?: string;
+        description?: string;
+        details?: object;
+    };
+}
