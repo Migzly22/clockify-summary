@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  clockiwar:
+    build: .
+    image: clockiwar:v1.0.0
+    ports:
+      - "3000:3000" 
+    volumes:
+      - /app
+    container_name: clockiwar
+    environment:
+      - NODE_ENV=production
+      - API_KEY='MTRmZWJiYjctY2QzOS00MWFhLTg1YmEtNzNhNDY4NThkNGE4'
+      - WORKSPACE='5f2b5bc6e89e8809e38b2e67'
+      - PUBLIC_API='http://localhost:8080'
+    # restart: unless-stopped
