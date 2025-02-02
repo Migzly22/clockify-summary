@@ -9,8 +9,5 @@ services:
       - /app
     container_name: clockiwar
     environment:
-      - NODE_ENV=production
-      - API_KEY='MTRmZWJiYjctY2QzOS00MWFhLTg1YmEtNzNhNDY4NThkNGE4'
-      - WORKSPACE='5f2b5bc6e89e8809e38b2e67'
-      - PUBLIC_API='http://localhost:8080'
+      - PUBLIC_API='http://localhost:5800'
     # restart: unless-stopped
