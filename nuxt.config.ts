@@ -16,7 +16,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
 		public: {
 			API_KEY: process.env.API_KEY ?? '',
-      WORKSPACE : process.env.WORKSPACE ?? ''
+      		WORKSPACE : process.env.WORKSPACE ?? '',
+			PUBLIC_URL : process.env.PUBLIC_API ?? 'http://localhost:5800'
 		}
 	},
   modules: ['@nuxt/ui', '@nuxtjs/tailwindcss'],
