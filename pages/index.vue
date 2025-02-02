@@ -17,10 +17,11 @@
 
 <script lang="ts" setup>
 
-import { sub, format, isSameDay, type Duration } from 'date-fns'
-import type { DataHolder, IUserData } from '~/constants/constants';
+import { sub } from 'date-fns'
+import type { IUserData } from '~/constants/constants';
 import { AGET } from '~/utils/axios';
 
+const { isoDate, dateFormatter, getWeekNo } = useDate()
 const isOpen = ref<boolean>(false)
 const isLoading = ref<boolean>(false)
 const loadingState = reactive({
@@ -46,11 +47,10 @@ const updateDetails = (data:object) => {
 const selectedDate = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const updateDate = (newData:any ) => selectedDate.value = newData;
 
-const { API_KEY, WORKSPACE } = useRuntimeConfig().public;
-const apiKey:string = (API_KEY as string)!; 
+const { PUBLIC_URL } = useRuntimeConfig().public;
 
 async function searchData() {
-  const workspaceId = userState?.value.workplaceId ?? (WORKSPACE ?? '');
+  const workspaceId = userState?.value.workplaceId ?? '';
   loadingState.search = true;
 
   try {
@@ -59,7 +59,7 @@ async function searchData() {
     let name =   userState.value!.firstName &&  userState.value!.lastName ? `${ userState.value!.firstName} ${ userState.value!.lastName}` : ''
 
     const res : any = await AGET({
-      link : `http://localhost:8080/clockify/main/user`,
+      link : `${PUBLIC_URL}/clockify/main/user`,
       params : {
         email : userState.value.email ?? '',
         name : name,
@@ -79,16 +79,19 @@ async function searchData() {
 }
 
 const printFile = async() => {
-  const workspaceId = userState?.value.workplaceId ?? (WORKSPACE ?? '');
+  const workspaceId = userState?.value.workplaceId ?? '';
   loadingState.print = true
 
   try {
     let startDate = `${isoDate(selectedDate.value.start)}T00:00:00Z`
     let endDate = `${isoDate(selectedDate.value.end)}T24:00:00Z`
-    let name =   userState.value!.firstName &&  userState.value!.lastName ? `${ userState.value!.firstName} ${ userState.value!.lastName}` : ''
+    let monthData = dateFormatter(selectedDate.value.start, { year: "numeric", month: "short" })
+    let weekNo = getWeekNo(selectedDate.value.start)
+    
+    let name =   userState.value!.firstName &&  userState.value!.lastName ? `${ userState.value!.lastName}, ${ userState.value!.firstName} ` : ''
 
     const res : any = await AGET({
-      link : `http://localhost:8080/clockify/main/print`,
+      link : `${PUBLIC_URL}/clockify/main/print`,
       params : {
         email : userState.value.email ?? '',
         name : name,
@@ -103,12 +106,12 @@ const printFile = async() => {
     let base64 = res.response;
     var a = document.createElement("a");
     a.href = "data:image/png;base64," + base64;
-    a.download = `${name}_${startDate} to ${endDate}.xlsx`;
+    a.download = `Accomplishment Report (${monthData} ${weekNo}) - ${name}.xlsx`;
     a.click();
 
     useToastNotification().success({
       title : "Downloading please wait...",
-      description : `Downloading ${name}_${startDate} to ${endDate}.xlsx`
+      description : `Downloading Accomplishment Report (${monthData} ${weekNo}) - ${name}.xlsx`
     })
 
   } catch (error) {
